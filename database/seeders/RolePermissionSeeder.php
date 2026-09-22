@@ -23,5 +23,9 @@ class RolePermissionSeeder extends Seeder
 
         $admin = Role::findOrCreate(UserRole::Admin->value);
         $admin->syncPermissions([UserPermission::ViewUsers->value]);
+
+        Role::findOrCreate(UserRole::Director->value);
+        Role::findOrCreate(UserRole::Manager->value);
+        Role::findOrCreate(UserRole::Courier->value);
     }
 }
