@@ -8,13 +8,14 @@ use Database\Factories\UserFactory;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasName;
 use Filament\Panel;
+use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 
-class User extends Authenticatable implements FilamentUser, HasName
+class User extends Authenticatable implements FilamentUser, HasLocalePreference, HasName
 {
     /** @use HasFactory<UserFactory> */
     use HasApiTokens, HasFactory, HasRoles, Notifiable;
@@ -28,6 +29,7 @@ class User extends Authenticatable implements FilamentUser, HasName
         'email',
         'password',
         'is_active',
+        'locale',
     ];
 
     /**
@@ -77,5 +79,14 @@ class User extends Authenticatable implements FilamentUser, HasName
     public function getFilamentName(): string
     {
         return $this->email;
+    }
+
+    /**
+     * The locale used for notifications, falling back to the app default
+     * when the user has not chosen one.
+     */
+    public function preferredLocale(): ?string
+    {
+        return $this->locale;
     }
 }

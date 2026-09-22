@@ -24,3 +24,19 @@ it('allows an active superadmin', function () {
 
     $this->actingAs($user)->get('/admin')->assertOk();
 });
+
+it('renders the admin panel in the user\'s stored locale', function () {
+    $user = User::factory()->withRole(UserRole::Superadmin->value)->create(['locale' => 'ka']);
+
+    $this->actingAs($user)->get('/admin')
+        ->assertOk()
+        ->assertSee('lang="ka"', false);
+});
+
+it('renders the admin panel in english when no locale is stored', function () {
+    $user = User::factory()->withRole(UserRole::Superadmin->value)->create(['locale' => null]);
+
+    $this->actingAs($user)->get('/admin')
+        ->assertOk()
+        ->assertSee('lang="en"', false);
+});
