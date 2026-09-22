@@ -49,7 +49,7 @@ class UserResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()->with('roles');
+        return parent::getEloquentQuery()->with(['roles', 'profile', 'profile.media']);
     }
 
     public static function getRelations(): array

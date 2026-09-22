@@ -52,6 +52,39 @@ it('updates an existing user email', function () {
     expect($target->fresh()->email)->toBe('updated@example.com');
 });
 
+it('creates a user with profile details', function () {
+    Livewire::test(CreateUser::class)
+        ->fillForm([
+            'email' => 'new@example.com',
+            'password' => 'password',
+            'is_active' => true,
+            'profile' => [
+                'name' => 'Nino',
+                'surname' => 'Beridze',
+                'phone' => '+995500000000',
+            ],
+        ])
+        ->call('create')
+        ->assertHasNoFormErrors();
+
+    $user = User::where('email', 'new@example.com')->first();
+
+    expect($user->profile->name)->toBe('Nino')
+        ->and($user->profile->surname)->toBe('Beridze')
+        ->and($user->profile->phone)->toBe('+995500000000');
+});
+
+it('updates an existing user\'s profile details', function () {
+    $target = User::factory()->create();
+
+    Livewire::test(EditUser::class, ['record' => $target->getRouteKey()])
+        ->fillForm(['profile' => ['name' => 'Updated Name']])
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    expect($target->fresh()->profile->name)->toBe('Updated Name');
+});
+
 it('disables the active toggle when editing your own account', function () {
     Livewire::test(EditUser::class, ['record' => $this->admin->getRouteKey()])
         ->assertFormFieldDisabled('is_active');

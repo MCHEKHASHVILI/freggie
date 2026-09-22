@@ -6,16 +6,18 @@ namespace App\Models;
 use App\Enums\UserRole;
 use Database\Factories\UserFactory;
 use Filament\Models\Contracts\FilamentUser;
+use Filament\Models\Contracts\HasAvatar;
 use Filament\Models\Contracts\HasName;
 use Filament\Panel;
 use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 
-class User extends Authenticatable implements FilamentUser, HasLocalePreference, HasName
+class User extends Authenticatable implements FilamentUser, HasAvatar, HasLocalePreference, HasName
 {
     /** @use HasFactory<UserFactory> */
     use HasApiTokens, HasFactory, HasRoles, Notifiable;
@@ -66,6 +68,19 @@ class User extends Authenticatable implements FilamentUser, HasLocalePreference,
     }
 
     /**
+     * Every user is guaranteed exactly one profile, created alongside them.
+     */
+    protected static function booted(): void
+    {
+        static::created(fn (User $user) => $user->profile()->create([]));
+    }
+
+    public function profile(): HasOne
+    {
+        return $this->hasOne(UserProfile::class);
+    }
+
+    /**
      * Only active superadmins may access the Filament admin panel.
      */
     public function canAccessPanel(Panel $panel): bool
@@ -74,11 +89,22 @@ class User extends Authenticatable implements FilamentUser, HasLocalePreference,
     }
 
     /**
-     * The users table has no name column; display the email instead.
+     * The user's name and surname, falling back to their email when the
+     * profile has neither set.
      */
+    public function fullName(): string
+    {
+        return $this->profile?->fullName() ?: $this->email;
+    }
+
     public function getFilamentName(): string
     {
-        return $this->email;
+        return $this->fullName();
+    }
+
+    public function getFilamentAvatarUrl(): ?string
+    {
+        return $this->profile?->avatarUrl();
     }
 
     /**

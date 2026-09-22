@@ -3,15 +3,18 @@
 namespace App\Filament\Resources\Users\Tables;
 
 use App\Enums\UserRole;
+use App\Models\User;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Spatie\Permission\Models\Role;
 
 class UsersTable
@@ -20,6 +23,18 @@ class UsersTable
     {
         return $table
             ->columns([
+                ImageColumn::make('avatar')
+                    ->label('')
+                    ->state(fn (User $record): ?string => $record->profile?->avatarUrl())
+                    ->circular(),
+                TextColumn::make('full_name')
+                    ->label(__('Name'))
+                    ->state(fn (User $record): string => $record->fullName())
+                    ->searchable(query: fn (Builder $query, string $search): Builder => $query->orWhereHas(
+                        'profile',
+                        fn (Builder $query) => $query->where('name', 'like', "%{$search}%")
+                            ->orWhere('surname', 'like', "%{$search}%"),
+                    )),
                 TextColumn::make('email')
                     ->label(__('Email'))
                     ->searchable()

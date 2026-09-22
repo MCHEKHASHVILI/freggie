@@ -17,6 +17,11 @@ class UserResource extends JsonResource
         return [
             'id' => $this->id,
             'email' => $this->email,
+            'name' => $this->whenLoaded('profile', fn () => $this->profile->name),
+            'surname' => $this->whenLoaded('profile', fn () => $this->profile->surname),
+            'full_name' => $this->fullName(),
+            'phone' => $this->whenLoaded('profile', fn () => $this->profile->phone),
+            'avatar_url' => $this->whenLoaded('profile', fn () => $this->profile->avatarUrl()),
             'is_active' => $this->is_active,
             'roles' => $this->whenLoaded('roles', fn () => $this->roles->pluck('name')),
             'created_at' => $this->created_at,

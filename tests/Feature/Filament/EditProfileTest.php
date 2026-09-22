@@ -3,6 +3,8 @@
 use App\Enums\UserRole;
 use App\Filament\Pages\EditProfile;
 use App\Models\User;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
 
 beforeEach(function () {
@@ -10,18 +12,46 @@ beforeEach(function () {
     $this->actingAs($this->user);
 });
 
-it('updates the authenticated user\'s locale', function () {
+it('does not expose an email field', function () {
     Livewire::test(EditProfile::class)
-        ->fillForm(['locale' => 'ka'])
+        ->assertFormFieldDoesNotExist('email');
+});
+
+it('updates the authenticated user\'s profile fields', function () {
+    Livewire::test(EditProfile::class)
+        ->fillForm([
+            'profile' => [
+                'name' => 'Nino',
+                'surname' => 'Beridze',
+                'phone' => '+995500000000',
+            ],
+        ])
         ->call('save')
         ->assertHasNoFormErrors();
 
-    expect($this->user->fresh()->locale)->toBe('ka');
+    $profile = $this->user->fresh()->profile;
+
+    expect($profile->name)->toBe('Nino')
+        ->and($profile->surname)->toBe('Beridze')
+        ->and($profile->phone)->toBe('+995500000000');
 });
 
-it('rejects an unsupported locale', function () {
+it('stores the uploaded avatar on the public disk so its url is reachable', function () {
+    Storage::fake('public');
+
     Livewire::test(EditProfile::class)
-        ->fillForm(['locale' => 'fr'])
+        ->fillForm([
+            'profile' => [
+                'avatar' => UploadedFile::fake()->image('avatar.jpg'),
+            ],
+        ])
         ->call('save')
-        ->assertHasFormErrors(['locale']);
+        ->assertHasNoFormErrors();
+
+    $media = $this->user->fresh()->profile->getFirstMedia('avatar');
+
+    expect($media)->not->toBeNull()
+        ->and($media->disk)->toBe('public');
+
+    Storage::disk('public')->assertExists($media->getPathRelativeToRoot());
 });

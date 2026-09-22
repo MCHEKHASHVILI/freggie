@@ -34,7 +34,7 @@ class AuthController extends Controller
 
         $token = $user->createToken('api')->plainTextToken;
 
-        return (new UserResource($user->load('roles')))
+        return (new UserResource($user->load(['roles', 'profile'])))
             ->additional(['token' => $token])
             ->response();
     }

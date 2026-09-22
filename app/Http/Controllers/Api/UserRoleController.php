@@ -17,6 +17,6 @@ class UserRoleController extends Controller
     {
         $user->syncRoles($request->safe()->array('roles'));
 
-        return (new UserResource($user->load('roles')))->response();
+        return (new UserResource($user->load(['roles', 'profile'])))->response();
     }
 }

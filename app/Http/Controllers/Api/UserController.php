@@ -23,7 +23,7 @@ class UserController extends Controller
         $search = $request->string('search')->trim()->toString();
 
         $users = User::query()
-            ->with('roles')
+            ->with(['roles', 'profile'])
             ->when($search !== '', fn ($query) => $query->where('email', 'like', "%{$search}%"))
             ->orderByDesc('created_at')
             ->orderByDesc('id')
@@ -39,7 +39,7 @@ class UserController extends Controller
     {
         $user = User::create($request->safe()->only(['email', 'password']));
 
-        return (new UserResource($user->load('roles')))->response()->setStatusCode(201);
+        return (new UserResource($user->load(['roles', 'profile'])))->response()->setStatusCode(201);
     }
 
     /**
@@ -49,7 +49,7 @@ class UserController extends Controller
     {
         Gate::authorize('view', $user);
 
-        return (new UserResource($user->load('roles')))->response();
+        return (new UserResource($user->load(['roles', 'profile'])))->response();
     }
 
     /**
@@ -59,7 +59,7 @@ class UserController extends Controller
     {
         $user->update($request->safe()->only(['email', 'password']));
 
-        return (new UserResource($user->load('roles')))->response();
+        return (new UserResource($user->load(['roles', 'profile'])))->response();
     }
 
     /**

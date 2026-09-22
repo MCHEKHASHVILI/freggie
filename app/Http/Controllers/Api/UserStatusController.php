@@ -17,6 +17,6 @@ class UserStatusController extends Controller
     {
         $user->update($request->safe()->only(['is_active']));
 
-        return (new UserResource($user->load('roles')))->response();
+        return (new UserResource($user->load(['roles', 'profile'])))->response();
     }
 }

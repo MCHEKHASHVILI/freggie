@@ -5,8 +5,10 @@ namespace App\Filament\Resources\Users\Schemas;
 use App\Enums\UserRole;
 use App\Models\User;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Schemas\Components\Group;
 use Filament\Schemas\Schema;
 use Illuminate\Validation\Rules\Password;
 use Spatie\Permission\Models\Role;
@@ -45,6 +47,25 @@ class UserForm
                     ->multiple()
                     ->preload()
                     ->searchable(),
+                Group::make()
+                    ->relationship('profile')
+                    ->schema([
+                        TextInput::make('name')
+                            ->label(__('Name'))
+                            ->columnSpanFull(),
+                        TextInput::make('surname')
+                            ->label(__('Surname'))
+                            ->columnSpanFull(),
+                        TextInput::make('phone')
+                            ->label(__('Phone'))
+                            ->columnSpanFull(),
+                        SpatieMediaLibraryFileUpload::make('avatar')
+                            ->label(__('Avatar'))
+                            ->collection('avatar')
+                            ->avatar()
+                            ->circleCropper()
+                            ->columnSpanFull(),
+                    ]),
             ]);
     }
 }
