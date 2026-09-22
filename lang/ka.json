@@ -1,4 +1,15 @@
 {
     "Your account has been deactivated.": "თქვენი ანგარიში დეაქტივირებულია.",
-    "Logged out successfully.": "წარმატებით გახვედით სისტემიდან."
+    "Logged out successfully.": "წარმატებით გახვედით სისტემიდან.",
+    "User": "მომხმარებელი",
+    "Users": "მომხმარებლები",
+    "Super Admin": "სუპერ ადმინი",
+    "Admin": "ადმინისტრატორი",
+    "Director": "დირექტორი",
+    "Manager": "მენეჯერი",
+    "Courier": "კურიერი",
+    "Email": "ელ. ფოსტა",
+    "Password": "პაროლი",
+    "Active": "აქტიური",
+    "Roles": "როლები"
 }

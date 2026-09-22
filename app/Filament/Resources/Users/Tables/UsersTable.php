@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Users\Tables;
 
+use App\Enums\UserRole;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
@@ -11,6 +12,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Spatie\Permission\Models\Role;
 
 class UsersTable
 {
@@ -19,13 +21,15 @@ class UsersTable
         return $table
             ->columns([
                 TextColumn::make('email')
+                    ->label(__('Email'))
                     ->searchable()
                     ->sortable(),
                 IconColumn::make('is_active')
-                    ->label('Active')
+                    ->label(__('Active'))
                     ->boolean(),
                 TextColumn::make('roles.name')
-                    ->label('Roles')
+                    ->label(__('Roles'))
+                    ->formatStateUsing(fn (string $state): string => UserRole::tryFrom($state)?->getLabel() ?? $state)
                     ->badge(),
                 TextColumn::make('created_at')
                     ->dateTime()
@@ -34,9 +38,10 @@ class UsersTable
             ])
             ->filters([
                 TernaryFilter::make('is_active')
-                    ->label('Active'),
+                    ->label(__('Active')),
                 SelectFilter::make('roles')
-                    ->relationship('roles', 'name'),
+                    ->relationship('roles', 'name')
+                    ->getOptionLabelFromRecordUsing(fn (Role $record): string => UserRole::tryFrom($record->name)?->getLabel() ?? $record->name),
             ])
             ->recordActions([
                 EditAction::make(),
