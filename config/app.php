@@ -86,6 +86,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Supported Locales
+    |--------------------------------------------------------------------------
+    |
+    | The locales the application ships translations for. Used to resolve the
+    | locale requested via the Accept-Language header on API requests.
+    |
+    */
+
+    'supported_locales' => ['en', 'ka'],
+
+    /*
+    |--------------------------------------------------------------------------
     | Encryption Key
     |--------------------------------------------------------------------------
     |

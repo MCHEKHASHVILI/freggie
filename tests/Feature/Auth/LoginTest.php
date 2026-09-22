@@ -50,3 +50,29 @@ it('requires an email and a password', function () {
         ->assertStatus(422)
         ->assertJsonValidationErrors(['email', 'password']);
 });
+
+it('translates validation messages to georgian when requested', function () {
+    $this->withHeader('Accept-Language', 'ka')
+        ->postJson('/api/login', [])
+        ->assertStatus(422)
+        ->assertJsonPath('errors.email.0', 'email ველი სავალდებულოა.');
+});
+
+it('translates the deactivated account message to georgian when requested', function () {
+    $user = User::factory()->inactive()->create();
+
+    $this->withHeader('Accept-Language', 'ka')
+        ->postJson('/api/login', [
+            'email' => $user->email,
+            'password' => 'password',
+        ])
+        ->assertStatus(422)
+        ->assertJsonPath('errors.email.0', 'თქვენი ანგარიში დეაქტივირებულია.');
+});
+
+it('falls back to english when the requested locale is not supported', function () {
+    $this->withHeader('Accept-Language', 'fr')
+        ->postJson('/api/login', [])
+        ->assertStatus(422)
+        ->assertJsonPath('errors.email.0', 'The email field is required.');
+});

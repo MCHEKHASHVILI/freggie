@@ -16,3 +16,14 @@ it('revokes the token used to authenticate the request', function () {
 
     expect($user->tokens()->count())->toBe(0);
 });
+
+it('translates the logout message to georgian when requested', function () {
+    $user = User::factory()->create();
+    $token = $user->createToken('test')->plainTextToken;
+
+    $this->withHeader('Authorization', "Bearer {$token}")
+        ->withHeader('Accept-Language', 'ka')
+        ->postJson('/api/logout')
+        ->assertOk()
+        ->assertJsonPath('message', 'წარმატებით გახვედით სისტემიდან.');
+});

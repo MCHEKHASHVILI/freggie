@@ -28,7 +28,7 @@ class AuthController extends Controller
 
         if (! $user->is_active) {
             throw ValidationException::withMessages([
-                'email' => 'Your account has been deactivated.',
+                'email' => __('Your account has been deactivated.'),
             ]);
         }
 
@@ -46,6 +46,6 @@ class AuthController extends Controller
     {
         $request->user()->currentAccessToken()->delete();
 
-        return response()->json(['message' => 'Logged out successfully.']);
+        return response()->json(['message' => __('Logged out successfully.')]);
     }
 }
