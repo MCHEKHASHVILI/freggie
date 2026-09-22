@@ -169,3 +169,4 @@ Before relying on a package's API, confirm its installed version:
 - Use spatie/laravel-permission for user management.
 - never change anything before asking a permission.
 - make test before implementation.
+- think about localization on every change.

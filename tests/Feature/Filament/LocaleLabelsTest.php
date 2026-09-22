@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\UserPermission;
 use App\Enums\UserRole;
 use App\Models\User;
 
@@ -62,4 +63,36 @@ it('shows the georgian field labels on the users table', function () {
         ->assertSee('ელ. ფოსტა')
         ->assertSee('აქტიური')
         ->assertSee('როლები');
+});
+
+it('shows the georgian role resource label', function () {
+    $admin = User::factory()->withRole(UserRole::Superadmin->value)->create(['locale' => 'ka']);
+
+    $this->actingAs($admin)->get('/admin/roles')
+        ->assertOk()
+        ->assertSee('როლები');
+});
+
+it('translates each permission label to georgian', function () {
+    app()->setLocale('ka');
+
+    expect(UserPermission::ViewUsers->getLabel())->toBe('მომხმარებლების ნახვა')
+        ->and(UserPermission::CreateUsers->getLabel())->toBe('მომხმარებლების შექმნა')
+        ->and(UserPermission::UpdateUsers->getLabel())->toBe('მომხმარებლების რედაქტირება')
+        ->and(UserPermission::DeleteUsers->getLabel())->toBe('მომხმარებლების წაშლა')
+        ->and(UserPermission::ManageUserStatus->getLabel())->toBe('მომხმარებლის სტატუსის მართვა')
+        ->and(UserPermission::ManageUserRoles->getLabel())->toBe('მომხმარებლის როლების მართვა');
+});
+
+it('shows the georgian permission labels on the create role page', function () {
+    $admin = User::factory()->withRole(UserRole::Superadmin->value)->create(['locale' => 'ka']);
+
+    $this->actingAs($admin)->get('/admin/roles/create')
+        ->assertOk()
+        ->assertSee('მომხმარებლების ნახვა')
+        ->assertSee('მომხმარებლების შექმნა')
+        ->assertSee('მომხმარებლების რედაქტირება')
+        ->assertSee('მომხმარებლების წაშლა')
+        ->assertSee('მომხმარებლის სტატუსის მართვა')
+        ->assertSee('მომხმარებლის როლების მართვა');
 });
